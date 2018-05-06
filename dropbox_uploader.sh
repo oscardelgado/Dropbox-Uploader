@@ -68,8 +68,6 @@ TEMP_FILE="$TMP_DIR/du_tmp_$RANDOM"
 BIN_DEPS="sed basename date grep stat dd mkdir"
 VERSION="1.0"
 
-alias shasum=sha256sum
-
 umask 077
 
 #Check the shell
@@ -1487,7 +1485,7 @@ function db_sha_local
     local SKIP=0
     local SHA_CONCAT=""
 
-    which shasum > /dev/null
+    which sha256sum > /dev/null
     if [[ $? != 0 ]]; then
         echo "ERR"
         return
@@ -1495,7 +1493,7 @@ function db_sha_local
 
     while ([[ $OFFSET -lt "$FILE_SIZE" ]]); do
         dd if="$FILE" of="$CHUNK_FILE" bs=4194304 skip=$SKIP count=1 2> /dev/null
-        local SHA=$(shasum -a 256 "$CHUNK_FILE" | awk '{print $1}')
+        local SHA=$(sha256sum "$CHUNK_FILE" | awk '{print $1}')
         SHA_CONCAT="${SHA_CONCAT}${SHA}"
 
         let OFFSET=$OFFSET+4194304
@@ -1503,7 +1501,7 @@ function db_sha_local
     done
 
     shaHex=$(echo $SHA_CONCAT | sed 's/\([0-9A-F]\{2\}\)/\\x\1/gI')
-    echo -ne $shaHex | shasum -a 256 | awk '{print $1}'
+    echo -ne $shaHex | sha256sum | awk '{print $1}'
 }
 
 ################
